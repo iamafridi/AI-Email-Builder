@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@layer utilities {
+  .animate-slideDown { animation: slideDown 0.3s ease-out; }
+}
+
+@layer base {
+  body {
+    @apply antialiased;
+  }
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-bg;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-dark-border rounded;
+  }
+}
+
+@layer utilities {
+  .border-priority-high { border-color: #ff4444; }
+  .border-priority-medium { border-color: #ff8c00; }
+  .border-priority-low { border-color: #3b82f6; }
+  .border-priority-none { border-color: #6b7280; }
+}
