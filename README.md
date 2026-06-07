@@ -1,6 +1,6 @@
 # AI Email Agent
 
-A real-time dashboard that reads incoming emails, classifies them by importance using AI (or rule-based fallback), and displays flagged notifications. Runs entirely via Docker Compose.
+AI Email Agent — A smart email triage dashboard that reads incoming emails, classifies them by importance using AI (OpenAI, Claude, Gemini, Ollama, or rule-based fallback), and displays important ones as real-time notifications. Features mock/CSV/IMAP email sources, duplicate prevention, Docker Compose setup, and a dark-themed React dashboard with priority filters, dismissals, and auto/manual polling. Built with FastAPI + React + Tailwind + SQLite.
 
 ## Live Demo
 
