@@ -13,8 +13,8 @@ CLASSIFICATION_PROMPT = """You are an email triage AI. Analyze the email and ret
   "reason": "one clear sentence explaining the decision"
 }
 
-Flag as important: client complaints, urgent customer requests, payment failures, billing issues, server/infrastructure alerts, security alerts.
-Flag as NOT important: newsletters, marketing, subscription confirmations, social media notifications, spam."""
+Flag as important: client complaints, urgent customer requests, payment failures, billing issues, server/infrastructure alerts, security alerts, subscription emails.
+Flag as NOT important: newsletters, marketing, social media notifications, spam."""
 
 
 def _default_result():
@@ -119,15 +119,18 @@ def _classify_rules(email: dict) -> dict:
     text = f"{email['subject']} {email['body']}".lower()
 
     high_patterns = [
-        (r"payment\s*fail|card\s*declin|invoice\s*overdue|billing\s*error", "PAYMENT_ISSUE"),
+        (r"payment\s*fail|card.*declin|invoice\s*overdue|billing\s*error", "PAYMENT_ISSUE"),
         (r"disappointed|chargeback|data loss|complain|refund\s*request", "CLIENT_COMPLAINT"),
         (r"server\s*down|database\s*unreachable|cpu.*threshold|alert|outage|incident", "SERVER_DOWN"),
         (r"urgent|asap|critical|emergency|immediate", "URGENT_REQUEST"),
     ]
 
+    medium_patterns = [
+        (r"receipt|subscription|renewed|your.*statement", "SUBSCRIPTION"),
+    ]
+
     low_patterns = [
         (r"unsubscribe|newsletter|weekly\s*digest|you won|prize|spam", "SPAM"),
-        (r"receipt|subscription|summary|your.*statement", "SUBSCRIPTION"),
     ]
 
     for pattern, category in high_patterns:
@@ -135,6 +138,15 @@ def _classify_rules(email: dict) -> dict:
             return {
                 "important": True,
                 "priority": "HIGH",
+                "category": category,
+                "reason": f"Matched keyword pattern '{pattern}' indicating {category}.",
+            }
+
+    for pattern, category in medium_patterns:
+        if re.search(pattern, text):
+            return {
+                "important": True,
+                "priority": "LOW",
                 "category": category,
                 "reason": f"Matched keyword pattern '{pattern}' indicating {category}.",
             }
