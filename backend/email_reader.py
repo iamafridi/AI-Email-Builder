@@ -67,11 +67,11 @@ class CsvEmailReader:
 
 
 class IMAPEmailReader:
-    def __init__(self):
-        self.host = os.getenv("IMAP_HOST", "imap.gmail.com")
-        self.port = int(os.getenv("IMAP_PORT", "993"))
-        self.user = os.getenv("IMAP_USER", "")
-        self.password = os.getenv("IMAP_PASSWORD", "")
+    def __init__(self, host=None, port=None, user=None, password=None):
+        self.host = host or os.getenv("IMAP_HOST", "imap.gmail.com")
+        self.port = int(port or os.getenv("IMAP_PORT", "993"))
+        self.user = user or os.getenv("IMAP_USER", "")
+        self.password = password or os.getenv("IMAP_PASSWORD", "")
 
     def get_new_emails(self):
         import imaplib
@@ -119,13 +119,14 @@ class IMAPEmailReader:
             return []
 
 
-def get_reader():
-    mode = os.getenv("EMAIL_MODE", "mock")
+def get_reader(mode=None, **kwargs):
+    mode = mode or os.getenv("EMAIL_MODE", "mock")
     if mode == "imap":
         logger.info("Using IMAP email reader")
-        return IMAPEmailReader()
+        return IMAPEmailReader(**kwargs)
     if mode == "csv":
         logger.info("Using CSV email reader")
-        return CsvEmailReader()
+        path = kwargs.get("path")
+        return CsvEmailReader(path=path)
     logger.info("Using mock email reader")
     return MockEmailReader()

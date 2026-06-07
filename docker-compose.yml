@@ -14,8 +14,7 @@ services:
       - OLLAMA_HOST=${OLLAMA_HOST:-}
       - EMAIL_MODE=${EMAIL_MODE:-mock}
       - POLL_INTERVAL_SECONDS=${POLL_INTERVAL_SECONDS:-30}
-    volumes:
-      - ./data:/app/data
+    # volumes:  # not supported on Railway - DB_DIR handles persistence locally
 
   frontend:
     build: ./frontend

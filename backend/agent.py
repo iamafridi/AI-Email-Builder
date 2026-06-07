@@ -29,6 +29,10 @@ class EmailAgent:
     def stop(self):
         self._stop = True
 
+    def set_reader(self, mode=None, **kwargs):
+        self.reader = get_reader(mode=mode, **kwargs)
+        logger.info("Reader swapped to mode=%s", mode or os.getenv("EMAIL_MODE", "mock"))
+
     def poll_now(self):
         logger.info("Manual poll triggered")
         self._poll_once()

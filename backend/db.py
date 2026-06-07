@@ -2,10 +2,12 @@ import sqlite3
 import os
 from datetime import datetime
 
-DB_PATH = os.getenv("DB_PATH", "/app/data/emails.db")
+DB_DIR = os.getenv("DB_DIR", os.path.join(os.path.dirname(__file__), "data"))
+DB_PATH = os.path.join(DB_DIR, "emails.db")
 
 
 def get_connection():
+    os.makedirs(DB_DIR, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
