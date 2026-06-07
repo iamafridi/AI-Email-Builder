@@ -1,0 +1,156 @@
+[
+  {
+    "id": "mock_001",
+    "sender": "billing@stripe.com",
+    "subject": "Payment failed for invoice #1042",
+    "body": "We were unable to charge your card ending in 4242 for invoice #1042 ($249.00). Please update your payment method to avoid service interruption.",
+    "received_at": "2026-06-07T09:15:00Z"
+  },
+  {
+    "id": "mock_002",
+    "sender": "accounting@quickbooks.com",
+    "subject": "Invoice #8901 is now overdue",
+    "body": "Your invoice #8901 in the amount of $1,200.00 was due on June 1st and is now 6 days overdue. Please remit payment immediately to avoid late fees.",
+    "received_at": "2026-06-07T09:30:00Z"
+  },
+  {
+    "id": "mock_003",
+    "sender": "support@chase.com",
+    "subject": "Your card was declined for a recurring charge",
+    "body": "A recurring charge of $49.99 was declined on your Chase business card ending in 9812. Your bank may need to verify this transaction.",
+    "received_at": "2026-06-07T10:00:00Z"
+  },
+  {
+    "id": "mock_004",
+    "sender": "sarah.johnson@clientcorp.com",
+    "subject": "Extremely disappointed with your service",
+    "body": "I am writing to express my extreme disappointment with the level of service we have received over the past month. Our account manager has been unresponsive and we are considering taking our business elsewhere. I expect a call from your VP of Customer Success by end of day.",
+    "received_at": "2026-06-07T10:15:00Z"
+  },
+  {
+    "id": "mock_005",
+    "sender": "mike@startup.io",
+    "subject": "Urgent: possible data loss in production",
+    "body": "We noticed that user data from the past 48 hours may have been lost due to a replication failure. This is urgent — please investigate immediately and restore from backups. Several enterprise customers are affected.",
+    "received_at": "2026-06-07T10:45:00Z"
+  },
+  {
+    "id": "mock_006",
+    "sender": "legal@merchant-processor.com",
+    "subject": "Threatening chargeback on order #3382",
+    "body": "Our records show a chargeback has been initiated for order #3382 in the amount of $3,450. The customer claims they did not authorize this transaction. Please provide all evidence within 7 days to dispute this chargeback.",
+    "received_at": "2026-06-07T11:00:00Z"
+  },
+  {
+    "id": "mock_007",
+    "sender": "alerts@datadog.com",
+    "subject": "ALERT: Production DB unreachable on primary region",
+    "body": "CRITICAL: The primary production database in us-east-1 has been unreachable for 3 minutes. Automatic failover to us-west-2 has been initiated. Verify data integrity once restored.",
+    "received_at": "2026-06-07T11:30:00Z"
+  },
+  {
+    "id": "mock_008",
+    "sender": "infra@cloudwatch.aws.com",
+    "subject": "CPU utilization exceeded 98% threshold",
+    "body": "ALARM: CPU utilization on instance i-0f9a8e2c1d3b4a5f6 has exceeded 98% for the past 15 minutes. Auto-scaling has been triggered. Consider investigating the root cause.",
+    "received_at": "2026-06-07T12:00:00Z"
+  },
+  {
+    "id": "mock_009",
+    "sender": "emily@clientcorp.com",
+    "subject": "Need the proposal by EOD today",
+    "body": "Hi team, our board meeting was moved up to tomorrow morning. We absolutely need the Q3 proposal and pricing by 6 PM today. Can you confirm someone will deliver this?",
+    "received_at": "2026-06-07T12:30:00Z"
+  },
+  {
+    "id": "mock_010",
+    "sender": "david@partnerfirm.com",
+    "subject": "Can we jump on a call right now?",
+    "body": "We have a critical issue with the API integration that needs immediate clarification. Are you free for a quick 15-minute call in the next hour? This is blocking our deployment.",
+    "received_at": "2026-06-07T13:00:00Z"
+  },
+  {
+    "id": "mock_011",
+    "sender": "receipts@netflix.com",
+    "subject": "Your Netflix subscription receipt — June 2026",
+    "body": "Thank you for being a Netflix member. Your monthly charge of $15.99 for the Standard plan has been processed. Your next billing date is July 7, 2026.",
+    "received_at": "2026-06-07T14:00:00Z"
+  },
+  {
+    "id": "mock_012",
+    "sender": "notifications@github.com",
+    "subject": "GitHub Actions: build #4723 completed",
+    "body": "Build #4723 (main) completed successfully in 4m 32s. 3 jobs passed. View the full log at https://github.com/yourorg/repo/actions/runs/4723.",
+    "received_at": "2026-06-07T14:30:00Z"
+  },
+  {
+    "id": "mock_013",
+    "sender": "billing@spotify.com",
+    "subject": "Your Spotify Premium plan has been renewed",
+    "body": "Your Spotify Premium Individual plan has been renewed. $9.99 will be charged to your payment method on file. You can manage your subscription in your account settings.",
+    "received_at": "2026-06-07T15:00:00Z"
+  },
+  {
+    "id": "mock_014",
+    "sender": "prizes@luckywinner.com",
+    "subject": "CONGRATULATIONS! You won a $1,000 gift card!",
+    "body": "You have been selected as the winner of our monthly draw! Click here to claim your $1,000 Amazon gift card. This is a limited time offer.",
+    "received_at": "2026-06-07T15:30:00Z"
+  },
+  {
+    "id": "mock_015",
+    "sender": "digest@medium.com",
+    "subject": "Your weekly reading digest",
+    "body": "Here are the top stories we think you'll enjoy this week: 'Building Microservices with Go', 'The Future of AI in 2026', and 'Why SQLite is Underrated'. Read now on Medium.",
+    "received_at": "2026-06-07T16:00:00Z"
+  },
+  {
+    "id": "mock_016",
+    "sender": "newsletter@techcrunch.com",
+    "subject": "TechCrunch Daily: AI startups raise $2B this week",
+    "body": "In today's edition: AI funding frenzy continues, Apple announces new chip, and Tesla's robotaxi plans revealed. Unsubscribe anytime by clicking here.",
+    "received_at": "2026-06-07T16:30:00Z"
+  },
+  {
+    "id": "mock_017",
+    "sender": "spammer@mailing-list.com",
+    "subject": "Unsubscribe from our emails",
+    "body": "You are receiving this email because you signed up for our newsletter. If you wish to unsubscribe, click the link at the bottom of this email.",
+    "received_at": "2026-06-07T17:00:00Z"
+  },
+  {
+    "id": "mock_018",
+    "sender": "hr@company.com",
+    "subject": "Updated company holiday schedule for 2026",
+    "body": "Please find attached the updated holiday schedule for the remainder of 2026. Key changes include an extra floating holiday and the office closure between Christmas and New Year.",
+    "received_at": "2026-06-07T09:00:00Z"
+  },
+  {
+    "id": "mock_019",
+    "sender": "it-support@company.com",
+    "subject": "Password reset requested for your account",
+    "body": "A password reset was requested for your corporate account. If you did not make this request, please contact IT security immediately.",
+    "received_at": "2026-06-07T08:30:00Z"
+  },
+  {
+    "id": "mock_020",
+    "sender": "lunch@ordereats.com",
+    "subject": "Your DoorDash order #8842 has been delivered",
+    "body": "Your DoorDash order from Sweetgreen has been delivered to the office reception. Enjoy your meal!",
+    "received_at": "2026-06-07T12:15:00Z"
+  },
+  {
+    "id": "mock_021",
+    "sender": "noreply@linkedin.com",
+    "subject": "You have 5 new connection requests",
+    "body": "5 people want to connect with you on LinkedIn. View their profiles and accept or decline these requests.",
+    "received_at": "2026-06-07T18:00:00Z"
+  },
+  {
+    "id": "mock_022",
+    "sender": "security@cloudflare.com",
+    "subject": "ALERT: DDoS attack mitigated on your domain",
+    "body": "Cloudflare automatically mitigated a DDoS attack targeting yourdomain.com. Peak traffic reached 1.2 Gbps. No downtime occurred. Review the attack details in your dashboard.",
+    "received_at": "2026-06-07T19:00:00Z"
+  }
+]
