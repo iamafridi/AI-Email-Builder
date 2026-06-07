@@ -35,11 +35,12 @@ class EmailAgent:
 
     def _poll_once(self):
         emails = self.reader.get_new_emails()
-        logger.info("Polled %d new emails", len(emails))
+        if emails:
+            logger.info("Polled %d new emails", len(emails))
         for email in emails:
             email_id = email["id"]
             if is_processed(email_id):
-                logger.debug("Skipping already processed email: %s", email_id)
+                logger.debug("Skipping (already processed): %s", email_id)
                 continue
 
             result = classify(email)

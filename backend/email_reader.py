@@ -14,13 +14,16 @@ class MockEmailReader:
             self.emails = json.load(f)
         self.cursor = 0
         self.total = len(self.emails)
+        self.exhausted = False
         logger.info("Loaded %d mock emails", self.total)
 
     def get_new_emails(self):
+        if self.exhausted:
+            return []
         start = self.cursor
         end = min(start + 2, self.total)
         if start >= self.total:
-            self.cursor = 0
+            self.exhausted = True
             return []
         batch = self.emails[start:end]
         self.cursor = end
