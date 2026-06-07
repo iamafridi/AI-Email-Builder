@@ -35,6 +35,17 @@ class MockEmailReader:
         logger.info("Delivering %d new mock emails (cursor: %d/%d)", len(batch), self.cursor, self.total)
         return batch
 
+    def get_all_remaining(self):
+        if self.exhausted:
+            return []
+        batch = self.emails[self.cursor:]
+        for email in batch:
+            email["source"] = self.source
+        self.cursor = self.total
+        self.exhausted = True
+        logger.info("Delivering all %d remaining mock emails", len(batch))
+        return batch
+
 
 COLUMN_ALIASES = {
     "sender": ["sender", "from", "from_email"],
@@ -101,6 +112,15 @@ class CsvEmailReader:
         logger.info("Delivering %d new CSV emails (cursor: %d/%d)", len(batch), self.cursor, self.total)
         return batch
 
+    def get_all_remaining(self):
+        if self.exhausted:
+            return []
+        batch = self.emails[self.cursor:]
+        self.cursor = self.total
+        self.exhausted = True
+        logger.info("Delivering all %d remaining CSV emails", len(batch))
+        return batch
+
 
 class IMAPEmailReader:
     def __init__(self, host=None, port=None, user=None, password=None):
@@ -109,6 +129,9 @@ class IMAPEmailReader:
         self.user = user or os.getenv("IMAP_USER", "")
         self.password = password or os.getenv("IMAP_PASSWORD", "")
         self.source = "imap"
+
+    def get_all_remaining(self):
+        return self.get_new_emails()
 
     def get_new_emails(self):
         import imaplib

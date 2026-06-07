@@ -16,6 +16,8 @@ export default function Dashboard() {
   const [statusMsg, setStatusMsg] = useState(null);
   const [csvFile, setCsvFile] = useState(null);
   const [csvUploading, setCsvUploading] = useState(false);
+  const [pollMode, setPollMode] = useState('auto');
+  const [loadingAll, setLoadingAll] = useState(false);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -39,12 +41,25 @@ export default function Dashboard() {
     }
   }, []);
 
+  const fetchPollMode = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_BASE}/poll-mode`);
+      if (res.ok) {
+        const data = await res.json();
+        setPollMode(data.mode);
+      }
+    } catch {
+      // silent fail
+    }
+  }, []);
+
   useEffect(() => {
     fetchNotifications();
     fetchConfig();
+    fetchPollMode();
     const interval = setInterval(fetchNotifications, 10000);
     return () => clearInterval(interval);
-  }, [fetchNotifications, fetchConfig]);
+  }, [fetchNotifications, fetchConfig, fetchPollMode]);
 
   const handleDismiss = async (id) => {
     try {
@@ -89,6 +104,7 @@ export default function Dashboard() {
       if (res.ok) {
         setConfig((c) => ({ ...c, mode: 'csv' }));
         setStatusMsg(`Loaded ${csvFile.name}`);
+        await handleLoadAll();
       } else {
         setStatusMsg('CSV upload failed');
       }
@@ -96,6 +112,36 @@ export default function Dashboard() {
       setStatusMsg('CSV upload failed');
     } finally {
       setCsvUploading(false);
+    }
+  };
+
+  const handleLoadAll = async () => {
+    setLoadingAll(true);
+    try {
+      await fetch(`${API_BASE}/load-all`, { method: 'POST' });
+      await fetchNotifications();
+    } catch {
+      // silent fail
+    } finally {
+      setLoadingAll(false);
+    }
+  };
+
+  const handlePollModeToggle = async () => {
+    const next = pollMode === 'auto' ? 'manual' : 'auto';
+    try {
+      const res = await fetch(`${API_BASE}/poll-mode`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: next }),
+      });
+      if (res.ok) {
+        setPollMode(next);
+        setStatusMsg(`Polling: ${next}`);
+        setTimeout(() => setStatusMsg(null), 3000);
+      }
+    } catch {
+      setStatusMsg('Failed to switch poll mode');
     }
   };
 
@@ -253,6 +299,35 @@ export default function Dashboard() {
           {statusMsg && (
             <div className="mt-2 text-accent text-xs">{statusMsg}</div>
           )}
+
+          <div className="border-t border-border mt-4 pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-text-muted text-xs uppercase tracking-wider">Polling</span>
+                <button
+                  onClick={handlePollModeToggle}
+                  className={`px-3 py-1 text-xs font-mono uppercase tracking-wider rounded border transition-colors ${
+                    pollMode === 'auto'
+                      ? 'border-accent text-accent bg-dark-surface'
+                      : 'border-border text-text-muted hover:border-text-muted'
+                  }`}
+                >
+                  {pollMode === 'auto' ? 'Auto' : 'Manual'}
+                </button>
+              </div>
+              <button
+                onClick={handleLoadAll}
+                disabled={loadingAll}
+                className={`px-3 py-1 text-xs font-mono uppercase tracking-wider rounded border transition-colors ${
+                  loadingAll
+                    ? 'border-border text-text-muted cursor-not-allowed opacity-50'
+                    : 'border-accent text-accent hover:bg-accent hover:text-bg-dark'
+                }`}
+              >
+                {loadingAll ? 'Loading…' : 'Load All Now'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

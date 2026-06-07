@@ -131,6 +131,7 @@ async def upload_csv(file: UploadFile = File(...)):
         os.environ["EMAIL_MODE"] = "csv"
         clear_all_notifications()
         agent.set_reader(mode="csv", path=CSV_FILE_PATH)
+        agent.load_all_remaining()
         return {"status": "ok", "mode": "csv", "file": file.filename}
     except Exception as e:
         logger.error("CSV upload failed:\n%s", traceback.format_exc())
@@ -152,3 +153,26 @@ def connect_imap(body: ConnectIMAPBody):
 def trigger_poll():
     agent.poll_now()
     return {"status": "polled"}
+
+
+@app.post("/api/load-all")
+def load_all():
+    agent.load_all_remaining()
+    return {"status": "ok"}
+
+
+class PollModeBody(BaseModel):
+    mode: str
+
+
+@app.post("/api/poll-mode")
+def set_poll_mode(body: PollModeBody):
+    if body.mode not in ("auto", "manual"):
+        raise HTTPException(status_code=400, detail="Mode must be 'auto' or 'manual'")
+    agent.set_paused(body.mode == "manual")
+    return {"status": "ok", "mode": body.mode}
+
+
+@app.get("/api/poll-mode")
+def get_poll_mode():
+    return {"mode": "manual" if agent.paused else "auto"}
