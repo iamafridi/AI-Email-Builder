@@ -1,4 +1,5 @@
 import json
+import csv
 import os
 import logging
 from datetime import datetime
@@ -6,6 +7,7 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 
 MOCK_FILE = os.path.join(os.path.dirname(__file__), "mock_emails.json")
+MOCK_CSV_FILE = os.path.join(os.path.dirname(__file__), "mock_emails.csv")
 
 
 class MockEmailReader:
@@ -28,6 +30,39 @@ class MockEmailReader:
         batch = self.emails[start:end]
         self.cursor = end
         logger.info("Delivering %d new mock emails (cursor: %d/%d)", len(batch), self.cursor, self.total)
+        return batch
+
+
+class CsvEmailReader:
+    def __init__(self, path=None):
+        self.path = path or os.getenv("CSV_MOCK_FILE", MOCK_CSV_FILE)
+        self.emails = []
+        with open(self.path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                self.emails.append({
+                    "id": row["id"],
+                    "sender": row["sender"],
+                    "subject": row["subject"],
+                    "body": row["body"],
+                    "received_at": row["received_at"],
+                })
+        self.cursor = 0
+        self.total = len(self.emails)
+        self.exhausted = False
+        logger.info("Loaded %d emails from CSV", self.total)
+
+    def get_new_emails(self):
+        if self.exhausted:
+            return []
+        start = self.cursor
+        end = min(start + 2, self.total)
+        if start >= self.total:
+            self.exhausted = True
+            return []
+        batch = self.emails[start:end]
+        self.cursor = end
+        logger.info("Delivering %d new CSV emails (cursor: %d/%d)", len(batch), self.cursor, self.total)
         return batch
 
 
@@ -89,5 +124,8 @@ def get_reader():
     if mode == "imap":
         logger.info("Using IMAP email reader")
         return IMAPEmailReader()
+    if mode == "csv":
+        logger.info("Using CSV email reader")
+        return CsvEmailReader()
     logger.info("Using mock email reader")
     return MockEmailReader()

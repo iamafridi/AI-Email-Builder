@@ -36,6 +36,8 @@ def classify(email: dict) -> dict:
             return _classify_claude(text)
         elif provider == "openai":
             return _classify_openai(text)
+        elif provider == "gemini":
+            return _classify_gemini(text)
         elif provider == "ollama":
             return _classify_ollama(text)
         else:
@@ -50,6 +52,8 @@ def _resolve_provider() -> str:
         return "claude"
     if os.getenv("OPENAI_API_KEY"):
         return "openai"
+    if os.getenv("GEMINI_API_KEY"):
+        return "gemini"
     if os.getenv("OLLAMA_HOST", "http://localhost:11434"):
         try:
             import urllib.request
@@ -79,6 +83,17 @@ def _classify_claude(text: str) -> dict:
         messages=[{"role": "user", "content": text}],
     )
     return _parse_json_response(response.content[0].text)
+
+
+def _classify_gemini(text: str) -> dict:
+    from google import genai
+    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    model = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+    response = client.models.generate_content(
+        model=model,
+        contents=f"{CLASSIFICATION_PROMPT}\n\n{text}",
+    )
+    return _parse_json_response(response.text)
 
 
 def _classify_openai(text: str) -> dict:

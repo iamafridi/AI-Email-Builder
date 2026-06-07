@@ -57,6 +57,7 @@ The classifier supports multiple providers, selected automatically by environmen
 |----------|-------------|-------------|
 | Claude | `ANTHROPIC_API_KEY` | Paid Anthropic account |
 | OpenAI-compatible | `OPENAI_API_KEY` + `OPENAI_BASE_URL` | Works with OpenAI, Groq, etc. |
+| Gemini | `GEMINI_API_KEY` | Free tier via Google AI Studio |
 | Ollama | `OLLAMA_HOST` (default: http://localhost:11434) | Local Ollama instance |
 | Rule-based (fallback) | — | Always available, no deps needed |
 
@@ -102,7 +103,9 @@ The dataset in `backend/mock_emails.json` contains 22 emails across all categori
 
 Emails are delivered 2 at a time per poll cycle to simulate realistic arrival.
 
-To add more emails, append objects to the array with the same schema:
+A matching `mock_emails.csv` file is also provided. To use CSV mode, set `EMAIL_MODE=csv` in `.env`.
+
+To add more emails, append objects to the JSON array or rows to the CSV with the same schema:
 
 ```json
 {
@@ -121,8 +124,11 @@ To add more emails, append objects to the array with the same schema:
 | `ANTHROPIC_API_KEY` | — | Claude API key for AI classification |
 | `OPENAI_API_KEY` | — | OpenAI-compatible API key |
 | `OPENAI_BASE_URL` | https://api.openai.com/v1 | Base URL for OpenAI-compatible API |
+| `GEMINI_API_KEY` | — | Google Gemini API key |
+| `GEMINI_MODEL` | gemini-2.0-flash | Gemini model name |
 | `OLLAMA_HOST` | http://localhost:11434 | Ollama server URL |
-| `EMAIL_MODE` | mock | Email source: `mock` or `imap` |
+| `EMAIL_MODE` | mock | Email source: `mock`, `csv`, or `imap` |
+| `CSV_MOCK_FILE` | backend/mock_emails.csv | Path to CSV file (when `EMAIL_MODE=csv`) |
 | `POLL_INTERVAL_SECONDS` | 30 | How often to poll for new emails |
 | `IMAP_HOST` | imap.gmail.com | IMAP server hostname |
 | `IMAP_PORT` | 993 | IMAP server port |
