@@ -1,16 +1,6 @@
 {
-  "services": {
-    "backend": {
-      "build": {
-        "builder": "DOCKERFILE",
-        "dockerfilePath": "backend/Dockerfile"
-      }
-    },
-    "frontend": {
-      "build": {
-        "builder": "DOCKERFILE",
-        "dockerfilePath": "frontend/Dockerfile"
-      }
-    }
+  "build": {
+    "builder": "DOCKERFILE",
+    "dockerfilePath": "Dockerfile"
   }
 }
