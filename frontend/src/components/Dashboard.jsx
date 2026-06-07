@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import StatsBar from './StatsBar';
 import FilterBar from './FilterBar';
 import NotificationCard from './NotificationCard';
+import Toast from './Toast';
 
 const API_BASE = window.location.origin + '/api';
 
@@ -13,11 +14,21 @@ export default function Dashboard() {
   const [showSettings, setShowSettings] = useState(false);
   const [config, setConfig] = useState({ mode: 'mock', available_modes: ['mock', 'csv', 'imap'], imap_connected: false });
   const [imapForm, setImapForm] = useState({ host: 'imap.gmail.com', port: 993, user: '', password: '' });
-  const [statusMsg, setStatusMsg] = useState(null);
   const [csvFile, setCsvFile] = useState(null);
   const [csvUploading, setCsvUploading] = useState(false);
   const [pollMode, setPollMode] = useState('auto');
   const [loadingAll, setLoadingAll] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [toasts, setToasts] = useState([]);
+
+  const addToast = (message, type = 'info') => {
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const removeToast = (id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -29,6 +40,8 @@ export default function Dashboard() {
       if (statsRes.ok) setStats(await statsRes.json());
     } catch {
       // silent fail
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -80,11 +93,10 @@ export default function Dashboard() {
       if (res.ok) {
         const data = await res.json();
         setConfig((c) => ({ ...c, mode: data.mode }));
-        setStatusMsg(`Switched to ${mode} mode`);
-        setTimeout(() => setStatusMsg(null), 3000);
+        addToast(`Switched to ${mode} mode`, 'success');
       }
     } catch {
-      setStatusMsg('Failed to switch mode');
+      addToast('Failed to switch mode', 'error');
     }
   };
 
@@ -96,20 +108,19 @@ export default function Dashboard() {
   const handleUploadSubmit = async () => {
     if (!csvFile) return;
     setCsvUploading(true);
-    setStatusMsg(null);
     const formData = new FormData();
     formData.append('file', csvFile);
     try {
       const res = await fetch(`${API_BASE}/upload-csv`, { method: 'POST', body: formData });
       if (res.ok) {
         setConfig((c) => ({ ...c, mode: 'csv' }));
-        setStatusMsg(`Loaded ${csvFile.name}`);
+        addToast(`Loaded ${csvFile.name}`, 'success');
         await handleLoadAll();
       } else {
-        setStatusMsg('CSV upload failed');
+        addToast('CSV upload failed', 'error');
       }
     } catch {
-      setStatusMsg('CSV upload failed');
+      addToast('CSV upload failed', 'error');
     } finally {
       setCsvUploading(false);
     }
@@ -120,8 +131,9 @@ export default function Dashboard() {
     try {
       await fetch(`${API_BASE}/load-all`, { method: 'POST' });
       await fetchNotifications();
+      addToast('All remaining emails loaded', 'success');
     } catch {
-      // silent fail
+      addToast('Failed to load emails', 'error');
     } finally {
       setLoadingAll(false);
     }
@@ -137,11 +149,10 @@ export default function Dashboard() {
       });
       if (res.ok) {
         setPollMode(next);
-        setStatusMsg(`Polling: ${next}`);
-        setTimeout(() => setStatusMsg(null), 3000);
+        addToast(`Polling: ${next}`, 'success');
       }
     } catch {
-      setStatusMsg('Failed to switch poll mode');
+      addToast('Failed to switch poll mode', 'error');
     }
   };
 
@@ -154,11 +165,10 @@ export default function Dashboard() {
       });
       if (res.ok) {
         setConfig((c) => ({ ...c, mode: 'imap', imap_connected: true }));
-        setStatusMsg('IMAP connected');
-        setTimeout(() => setStatusMsg(null), 3000);
+        addToast('IMAP connected', 'success');
       }
     } catch {
-      setStatusMsg('IMAP connection failed');
+      addToast('IMAP connection failed', 'error');
     }
   };
 
@@ -248,9 +258,6 @@ export default function Dashboard() {
                   {csvUploading ? 'Uploading…' : 'Upload'}
                 </button>
               </div>
-              {statusMsg && (
-                <div className="mt-2 text-accent text-xs">{statusMsg}</div>
-              )}
             </div>
           )}
 
@@ -296,10 +303,6 @@ export default function Dashboard() {
             </div>
           )}
 
-          {statusMsg && (
-            <div className="mt-2 text-accent text-xs">{statusMsg}</div>
-          )}
-
           <div className="border-t border-border mt-4 pt-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -331,7 +334,21 @@ export default function Dashboard() {
         </div>
       )}
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div>
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-dark-surface border border-dark-border border-l-4 border-dark-border rounded p-4 mb-3 animate-pulse-shimmer">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="h-4 w-14 rounded bg-dark-border" />
+                <div className="h-4 w-24 rounded bg-dark-border" />
+              </div>
+              <div className="h-5 w-3/4 rounded bg-dark-border mb-2" />
+              <div className="h-3 w-1/3 rounded bg-dark-border mb-2" />
+              <div className="h-3 w-1/2 rounded bg-dark-border" />
+            </div>
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="text-center py-20">
           <div className="text-4xl mb-4 text-text-muted">[ ]</div>
           <p className="text-text-muted font-mono text-sm">
@@ -345,6 +362,14 @@ export default function Dashboard() {
           ))}
         </div>
       )}
+
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+        {toasts.map((t) => (
+          <div key={t.id} className="pointer-events-auto">
+            <Toast message={t.message} type={t.type} onRemove={() => removeToast(t.id)} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
