@@ -6,6 +6,10 @@ AI Email Agent — A smart email triage dashboard that reads incoming emails, cl
 
 > [ai-email-builder-production.up.railway.app](https://ai-email-builder-production.up.railway.app)
 
+## Demo Picture : 
+<img width="1919" height="972" alt="Screenshot 2026-06-07 220802" src="https://github.com/user-attachments/assets/2a3e8dfc-8b17-43bf-ad52-7148722ee0df" />
+
+
 ## Architecture
 
 ```
