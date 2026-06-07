@@ -1,5 +1,6 @@
 import os
 import shutil
+import traceback
 import logging
 from contextlib import asynccontextmanager
 
@@ -123,11 +124,15 @@ def set_config(body: ConfigBody):
 async def upload_csv(file: UploadFile = File(...)):
     if not file.filename.endswith(".csv"):
         raise HTTPException(status_code=400, detail="File must be a CSV")
-    with open(CSV_FILE_PATH, "wb") as f:
-        shutil.copyfileobj(file.file, f)
-    os.environ["EMAIL_MODE"] = "csv"
-    agent.set_reader(mode="csv", path=CSV_FILE_PATH)
-    return {"status": "ok", "mode": "csv", "file": file.filename}
+    try:
+        with open(CSV_FILE_PATH, "wb") as f:
+            shutil.copyfileobj(file.file, f)
+        os.environ["EMAIL_MODE"] = "csv"
+        agent.set_reader(mode="csv", path=CSV_FILE_PATH)
+        return {"status": "ok", "mode": "csv", "file": file.filename}
+    except Exception as e:
+        logger.error("CSV upload failed:\n%s", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"Failed to load CSV: {e}")
 
 
 @app.post("/api/connect-imap")
@@ -138,10 +143,6 @@ def connect_imap(body: ConnectIMAPBody):
     os.environ["IMAP_PASSWORD"] = body.password
     agent.set_reader(mode="imap", host=body.host, port=body.port, user=body.user, password=body.password)
     return {"status": "ok", "mode": "imap", "host": body.host}
-
-
-class PollResponse(BaseModel):
-    status: str
 
 
 @app.post("/api/poll")
