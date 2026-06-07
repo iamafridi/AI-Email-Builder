@@ -37,19 +37,33 @@ class CsvEmailReader:
     def __init__(self, path=None):
         self.path = path or os.getenv("CSV_MOCK_FILE", MOCK_CSV_FILE)
         self.emails = []
-        with open(self.path, "r", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                self.emails.append({
-                    "id": row["id"],
-                    "sender": row["sender"],
-                    "subject": row["subject"],
-                    "body": row["body"],
-                    "received_at": row["received_at"],
-                })
         self.cursor = 0
-        self.total = len(self.emails)
+        self.total = 0
         self.exhausted = False
+        try:
+            with open(self.path, "r", encoding="utf-8-sig") as f:
+                reader = csv.DictReader(f)
+                if not reader.fieldnames:
+                    raise ValueError("CSV file is empty or has no header row")
+                required = {"id", "sender", "subject", "body", "received_at"}
+                missing = required - set(reader.fieldnames)
+                if missing:
+                    raise ValueError(
+                        f"CSV missing required columns: {', '.join(sorted(missing))}. "
+                        f"Found: {', '.join(reader.fieldnames)}"
+                    )
+                for row in reader:
+                    self.emails.append({
+                        "id": row["id"],
+                        "sender": row["sender"],
+                        "subject": row["subject"],
+                        "body": row["body"],
+                        "received_at": row["received_at"],
+                    })
+        except Exception as e:
+            logger.error("Failed to load CSV: %s", e)
+            raise
+        self.total = len(self.emails)
         logger.info("Loaded %d emails from CSV", self.total)
 
     def get_new_emails(self):
