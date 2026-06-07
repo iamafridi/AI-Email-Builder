@@ -31,9 +31,14 @@ def init_db():
             category TEXT,
             reason TEXT,
             received_at TEXT,
+            source TEXT DEFAULT '',
             created_at TEXT NOT NULL
         )
     """)
+    try:
+        conn.execute("ALTER TABLE notifications ADD COLUMN source TEXT DEFAULT ''")
+    except Exception:
+        pass
     conn.commit()
     conn.close()
 
@@ -59,8 +64,8 @@ def save_notification(notification: dict):
     conn = get_connection()
     conn.execute(
         """INSERT OR IGNORE INTO notifications
-           (id, sender, subject, body_preview, priority, category, reason, received_at, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+           (id, sender, subject, body_preview, priority, category, reason, received_at, source, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
             notification["id"],
             notification["sender"],
@@ -70,6 +75,7 @@ def save_notification(notification: dict):
             notification["category"],
             notification["reason"],
             notification["received_at"],
+            notification.get("source", ""),
             datetime.utcnow().isoformat(),
         ),
     )
@@ -87,6 +93,7 @@ def get_all_notifications():
 def clear_all_notifications():
     conn = get_connection()
     conn.execute("DELETE FROM notifications")
+    conn.execute("DELETE FROM processed_emails")
     conn.commit()
     conn.close()
 

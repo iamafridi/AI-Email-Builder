@@ -58,6 +58,7 @@ class EmailAgent:
                     "category": result.get("category", "OTHER"),
                     "reason": result.get("reason", ""),
                     "received_at": email.get("received_at", ""),
+                    "source": email.get("source", ""),
                 }
                 save_notification(notification)
                 logger.info("Flagged as important: %s — %s", email_id, email["subject"])

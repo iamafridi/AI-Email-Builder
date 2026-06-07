@@ -17,6 +17,7 @@ class MockEmailReader:
         self.cursor = 0
         self.total = len(self.emails)
         self.exhausted = False
+        self.source = "mock"
         logger.info("Loaded %d mock emails", self.total)
 
     def get_new_emails(self):
@@ -28,6 +29,8 @@ class MockEmailReader:
             self.exhausted = True
             return []
         batch = self.emails[start:end]
+        for email in batch:
+            email["source"] = self.source
         self.cursor = end
         logger.info("Delivering %d new mock emails (cursor: %d/%d)", len(batch), self.cursor, self.total)
         return batch
@@ -45,6 +48,7 @@ class CsvEmailReader:
         self.cursor = 0
         self.total = 0
         self.exhausted = False
+        self.source = "csv"
         try:
             with open(self.path, "r", encoding="utf-8-sig") as f:
                 reader = csv.DictReader(f)
@@ -76,6 +80,7 @@ class CsvEmailReader:
                         "subject": mapped["subject"],
                         "body": mapped["body"],
                         "received_at": mapped["received_at"],
+                        "source": self.source,
                     })
         except Exception as e:
             logger.error("Failed to load CSV: %s", e)
@@ -103,6 +108,7 @@ class IMAPEmailReader:
         self.port = int(port or os.getenv("IMAP_PORT", "993"))
         self.user = user or os.getenv("IMAP_USER", "")
         self.password = password or os.getenv("IMAP_PASSWORD", "")
+        self.source = "imap"
 
     def get_new_emails(self):
         import imaplib
@@ -142,6 +148,7 @@ class IMAPEmailReader:
                     "subject": subject,
                     "body": body[:500],
                     "received_at": received_at,
+                    "source": self.source,
                 })
             mail.logout()
             return results

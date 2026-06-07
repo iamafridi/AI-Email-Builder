@@ -51,6 +51,11 @@ export default function NotificationCard({ notification, onDismiss }) {
             <span className="inline-block px-2 py-0.5 text-[11px] font-mono text-text-muted bg-dark-bg rounded border border-dark-border">
               {notification.category}
             </span>
+            {notification.source && (
+              <span className="inline-block px-2 py-0.5 text-[11px] font-mono uppercase tracking-wider rounded bg-accent/10 text-accent border border-accent/30">
+                {notification.source}
+              </span>
+            )}
           </div>
           <h3 className="text-base font-semibold text-text-primary truncate">{notification.subject}</h3>
           <p className="text-sm font-mono text-text-muted mt-1">From: {notification.sender}</p>

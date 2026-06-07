@@ -116,6 +116,7 @@ def set_config(body: ConfigBody):
     if body.mode not in ("mock", "csv", "imap"):
         raise HTTPException(status_code=400, detail=f"Invalid mode: {body.mode}")
     os.environ["EMAIL_MODE"] = body.mode
+    clear_all_notifications()
     agent.set_reader(mode=body.mode)
     return {"status": "ok", "mode": body.mode}
 
@@ -128,6 +129,7 @@ async def upload_csv(file: UploadFile = File(...)):
         with open(CSV_FILE_PATH, "wb") as f:
             shutil.copyfileobj(file.file, f)
         os.environ["EMAIL_MODE"] = "csv"
+        clear_all_notifications()
         agent.set_reader(mode="csv", path=CSV_FILE_PATH)
         return {"status": "ok", "mode": "csv", "file": file.filename}
     except Exception as e:
@@ -141,6 +143,7 @@ def connect_imap(body: ConnectIMAPBody):
     os.environ["IMAP_PORT"] = str(body.port)
     os.environ["IMAP_USER"] = body.user
     os.environ["IMAP_PASSWORD"] = body.password
+    clear_all_notifications()
     agent.set_reader(mode="imap", host=body.host, port=body.port, user=body.user, password=body.password)
     return {"status": "ok", "mode": "imap", "host": body.host}
 
