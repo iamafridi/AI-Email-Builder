@@ -161,7 +161,7 @@ def _classify_rules(email: dict) -> dict:
         if re.search(pattern, text):
             return {
                 "important": True,
-                "priority": "LOW",
+                "priority": "MEDIUM",
                 "category": category,
                 "reason": f"Matched keyword pattern '{pattern}' indicating {category}.",
             }

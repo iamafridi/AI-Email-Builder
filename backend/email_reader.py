@@ -87,13 +87,13 @@ class IMAPEmailReader:
             mail.login(self.user, self.password)
             mail.select("INBOX")
 
-            _, data = mail.search(None, "UNSEEN")
+            _, data = mail.uid('search', None, "UNSEEN")
             results = []
-            for num in data[0].split():
-                _, msg_data = mail.fetch(num, "(RFC822)")
+            for uid in data[0].split():
+                _, msg_data = mail.uid('fetch', uid, "(RFC822)")
                 raw_email = msg_data[0][1]
                 msg = email_lib.message_from_bytes(raw_email)
-                email_id = str(num.decode())
+                email_id = uid.decode()
                 sender = msg.get("From", "unknown")
                 subject = msg.get("Subject", "(no subject)")
                 received_at = parsedate_to_datetime(msg.get("Date")).isoformat()

@@ -2,6 +2,10 @@
 
 A real-time dashboard that reads incoming emails, classifies them by importance using AI (or rule-based fallback), and displays flagged notifications. Runs entirely via Docker Compose.
 
+## Live Demo
+
+> [ai-email-builder-production.up.railway.app](https://ai-email-builder-production.up.railway.app)
+
 ## Architecture
 
 ```
