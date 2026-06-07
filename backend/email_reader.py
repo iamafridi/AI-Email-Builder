@@ -33,6 +33,11 @@ class MockEmailReader:
         return batch
 
 
+COLUMN_ALIASES = {
+    "sender": ["sender", "from", "from_email"],
+    "received_at": ["received_at", "timestamp", "date", "datetime", "received"],
+}
+
 class CsvEmailReader:
     def __init__(self, path=None):
         self.path = path or os.getenv("CSV_MOCK_FILE", MOCK_CSV_FILE)
@@ -45,20 +50,32 @@ class CsvEmailReader:
                 reader = csv.DictReader(f)
                 if not reader.fieldnames:
                     raise ValueError("CSV file is empty or has no header row")
+                normalized = {}
+                for col in reader.fieldnames:
+                    for canonical, aliases in COLUMN_ALIASES.items():
+                        if col.lower() in [a.lower() for a in aliases]:
+                            normalized[col] = canonical
+                            break
+                    else:
+                        normalized[col] = col
+                normalized_headers = set(normalized.values())
                 required = {"id", "sender", "subject", "body", "received_at"}
-                missing = required - set(reader.fieldnames)
+                missing = required - normalized_headers
                 if missing:
                     raise ValueError(
                         f"CSV missing required columns: {', '.join(sorted(missing))}. "
                         f"Found: {', '.join(reader.fieldnames)}"
                     )
                 for row in reader:
+                    mapped = {}
+                    for col, val in row.items():
+                        mapped[normalized.get(col, col)] = val
                     self.emails.append({
-                        "id": row["id"],
-                        "sender": row["sender"],
-                        "subject": row["subject"],
-                        "body": row["body"],
-                        "received_at": row["received_at"],
+                        "id": mapped["id"],
+                        "sender": mapped["sender"],
+                        "subject": mapped["subject"],
+                        "body": mapped["body"],
+                        "received_at": mapped["received_at"],
                     })
         except Exception as e:
             logger.error("Failed to load CSV: %s", e)
