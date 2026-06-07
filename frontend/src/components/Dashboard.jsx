@@ -14,6 +14,8 @@ export default function Dashboard() {
   const [config, setConfig] = useState({ mode: 'mock', available_modes: ['mock', 'csv', 'imap'], imap_connected: false });
   const [imapForm, setImapForm] = useState({ host: 'imap.gmail.com', port: 993, user: '', password: '' });
   const [statusMsg, setStatusMsg] = useState(null);
+  const [csvFile, setCsvFile] = useState(null);
+  const [csvUploading, setCsvUploading] = useState(false);
 
   const fetchNotifications = useCallback(async () => {
     try {
@@ -71,20 +73,29 @@ export default function Dashboard() {
     }
   };
 
-  const handleCsvUpload = async (e) => {
+  const handleFileSelect = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (file) setCsvFile(file);
+  };
+
+  const handleUploadSubmit = async () => {
+    if (!csvFile) return;
+    setCsvUploading(true);
+    setStatusMsg(null);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', csvFile);
     try {
       const res = await fetch(`${API_BASE}/upload-csv`, { method: 'POST', body: formData });
       if (res.ok) {
         setConfig((c) => ({ ...c, mode: 'csv' }));
-        setStatusMsg(`Loaded ${file.name}`);
-        setTimeout(() => setStatusMsg(null), 3000);
+        setStatusMsg(`Loaded ${csvFile.name}`);
+      } else {
+        setStatusMsg('CSV upload failed');
       }
     } catch {
       setStatusMsg('CSV upload failed');
+    } finally {
+      setCsvUploading(false);
     }
   };
 
@@ -172,12 +183,28 @@ export default function Dashboard() {
               <label className="block mb-1 text-text-muted text-xs uppercase tracking-wider">
                 Upload CSV File
               </label>
-              <input
-                type="file"
-                accept=".csv"
-                onChange={handleCsvUpload}
-                className="block w-full text-xs text-text-muted file:mr-3 file:py-1 file:px-3 file:rounded file:border file:border-border file:bg-bg-dark file:text-text-main file:text-xs file:font-mono hover:file:border-accent"
-              />
+              <div className="flex gap-2 items-center">
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileSelect}
+                  className="block text-xs text-text-muted file:mr-3 file:py-1 file:px-3 file:rounded file:border file:border-border file:bg-bg-dark file:text-text-main file:text-xs file:font-mono hover:file:border-accent flex-1"
+                />
+                <button
+                  onClick={handleUploadSubmit}
+                  disabled={!csvFile || csvUploading}
+                  className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider rounded border transition-colors ${
+                    !csvFile || csvUploading
+                      ? 'border-border text-text-muted cursor-not-allowed opacity-50'
+                      : 'border-accent text-accent hover:bg-accent hover:text-bg-dark'
+                  }`}
+                >
+                  {csvUploading ? 'Uploading…' : 'Upload'}
+                </button>
+              </div>
+              {statusMsg && (
+                <div className="mt-2 text-accent text-xs">{statusMsg}</div>
+              )}
             </div>
           )}
 
